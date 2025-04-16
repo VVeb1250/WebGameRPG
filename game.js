@@ -1,13 +1,14 @@
 const scene = document.getElementById("scene");
 const menu = document.getElementById("menu");
-const statusBox = document.getElementById("status");
+const statusBox = document.getElementById("statusBox");
 
-const logBox = document.getElementById("log");
+const logBox = document.getElementById("logBox");
 const logSound = document.getElementById("log-sound");
 
 let activeSideQuest = null;
 let sideQuestStep = 0;
 let sideQuests = {};
+let activeSideQuests = []; // เก็บหลายเควสต์
 
 const questLog = document.getElementById("quest-log");
 
@@ -143,73 +144,98 @@ function handleEffect(effect) {
 }
 
 function updateQuestLog() {
-    if (!activeSideQuest) {
-      questLog.textContent = "- ไม่มีเควสต์ -";
+    if (activeSideQuests.length === 0) {
+      questLog.innerHTML = "- ไม่มีเควสต์ -";
       return;
     }
   
-    const quest = sideQuests[activeSideQuest];
-    const step = quest[sideQuestStep];
-  
-    questLog.innerHTML = `
-      <strong>${activeSideQuest}</strong><br>
-      ${step.text}
-    `;
+    questLog.innerHTML = activeSideQuests.map(q => {
+      const step = sideQuests[q.name][q.step];
+      return `<strong>${q.name}</strong><br>${step.text}`;
+    }).join("<hr>");
+  }
+function hasQuest(name) {
+    return activeSideQuests.some(q => q.name === name);
   }
 function clearQuest() {
     activeSideQuest = null;
     sideQuestStep = 0;
     updateQuestLog();
   }
+function removeQuest(name) {
+    activeSideQuests = activeSideQuests.filter(q => q.name !== name);
+    updateQuestLog();
+  }
 
 function startSideQuest(name) {
-    activeSideQuest = name;
-    sideQuestStep = 0;
-    updateQuestLog();
-    nextSideQuestStep();
-  }
+    if (!sideQuests[name]) {
+      console.warn(`ไม่พบเควสต์ชื่อ ${name}`);
+      return;
+    }
   
-function nextSideQuestStep() {
-    const quest = sideQuests[activeSideQuest];
-    const step = quest[sideQuestStep];
+    const existing = activeSideQuests.find(q => q.name === name);
+    if (existing) {
+      log(`คุณรับเควสต์ "${name}" ไปแล้ว!`);
+      return;
+    }
+  
+    activeSideQuests.push({
+      name,
+      step: 0
+    });
+  
+    log(`🆕 คุณได้รับเควสต์ใหม่: ${name}`);
+    updateQuestLog();
+    playSideQuestStep(name);
+}
+  
+function playSideQuestStep(name) {
+    const quest = sideQuests[name];
+    const questState = activeSideQuests.find(q => q.name === name);
+    const step = quest[questState.step];
 
+    // เงื่อนไขเปลี่ยนข้อความ
+    if (step.condition && eval(step.condition)) {
+        if (step.textAlt) step.text = step.textAlt;
+    }
+  
     scene.innerHTML = step.emoji;
     statusBox.innerHTML = `<p>${step.text}</p>`;
     menu.innerHTML = "";
-
+  
     updateQuestLog();
-
+  
     if (step.choices) {
-    step.choices.forEach(choice => {
+      step.choices.forEach(choice => {
         const btn = document.createElement("button");
         btn.className = "button";
         btn.textContent = choice.text;
         btn.onclick = () => {
-        if (choice.effect === "next") {
-            sideQuestStep++;
-            nextSideQuestStep();
-        } else if (choice.effect === "exit") {
-            log("คุณออกจากเควสต์และกลับสู่การเดินทางปกติ");
-            activeSideQuest = null;
+          if (choice.effect === "next") {
+            questState.step++;
+            playSideQuestStep(name);
+          } else if (choice.effect === "exit") {
+            log(`คุณยกเลิกเควสต์ "${name}"`);
+            removeQuest(name);
             nextEvent();
-        } else {
+          } else {
             handleEffect(choice.effect);
-        }
+          }
         };
         menu.appendChild(btn);
-    });
+      });
     } else {
-    handleEffect(step.effect);
-    sideQuestStep++;
-    if (sideQuestStep < quest.length) {
-        menu.innerHTML = `<button class="button" onclick="nextSideQuestStep()">▶ ดำเนินต่อ</button>`;
-    } else {
-        log("เควสต์ย่อยสำเร็จ!");
-        activeSideQuest = null;
+      handleEffect(step.effect);
+      questState.step++;
+      if (questState.step < quest.length) {
+        menu.innerHTML = `<button class="button" onclick="playSideQuestStep('${name}')">▶ ดำเนินต่อ</button>`;
+      } else {
+        log(`✅ เควสต์ "${name}" สำเร็จ!`);
+        removeQuest(name);
         menu.innerHTML = `<button class="button" onclick="nextEvent()">▶ เดินทางต่อ</button>`;
+      }
     }
-    }
-}
+  }
 
 function restart() {
     player.hp = player.maxHp;

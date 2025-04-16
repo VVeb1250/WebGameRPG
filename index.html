@@ -1,34 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Emoji Fantasy RPG</title>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌟 เกมผจญภัย RPG</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div id="game-container">
-        <h1>🌟 Emoji Fantasy RPG 🌟</h1>
-        
-        <div id="scene"> <!-- ฉากแสดงอีโมจิ --> </div>
-        
-        <div id="status"></div>
 
-        <div id="quest-box">
-            <h3>📜 เควสต์ปัจจุบัน</h3>
-            <div id="quest-log">- ไม่มีเควสต์ -</div>
-        </div>
-        
-        <div id="log-box">
-            <h3>📜 เหตุการณ์</h3>
-            <div id="log"></div>
-        </div>
-        
-        <div id="menu"> <!-- ปุ่มเมนูต่อสู้ --> </div>
-        
-        <audio id="log-sound" src="assets\sounds\blip-131856.mp3" preload="auto"></audio>
-    </div>
-    
-    <script src="game.js" defer></script>
+  <!-- หัวเกม -->
+  <header id="game-header">
+    <h1>🌟 ผจญภัยแฟนตาซี</h1>
+  </header>
+
+  <!-- กล่องใหญ่ครอบทุกส่วนของเกม -->
+  <main id="game-layout">
+
+    <!-- 🧍‍♂️ ช่องแสดงตัวละคร -->
+    <aside id="player-panel">
+      <h2>🧍‍♂️ ตัวละคร</h2>
+      <div class="portrait">🧙‍♂️</div>
+      <p><strong>ชื่อ:</strong> นักผจญภัย</p>
+      <p id="hp">❤️ HP: 100</p>
+      <p id="atk">🗡️ ATK: 10</p>
+    </aside>
+
+    <!-- พื้นที่หลักของเกม -->
+    <section id="game-main">
+
+      <!-- 🌄 ฉาก -->
+      <div id="scene">🌄</div>
+
+      <!-- ✨ สถานะสถานการณ์ -->
+      <div id="statusBox">คุณยืนอยู่หน้าหมู่บ้าน...</div>
+
+      <!-- 🔘 ปุ่มเลือก -->
+      <nav id="menu">
+        <!-- ปุ่มจะถูก JS ใส่ทีหลัง -->
+      </nav>
+
+      <!-- 📜 เควสต์ -->
+      <div id="quest-box">
+        <h3>📜 เควสต์</h3>
+        <div id="quest-log">- ไม่มีเควสต์ -</div>
+      </div>
+
+      <!-- 🧾 บันทึกข้อความ -->
+      <div id="logBox" class="log-box"></div>
+
+    </section>
+
+    <!-- 🎒 กล่องไอเทม -->
+    <aside id="inventory-box">
+      <h2>🎒 ไอเทม</h2>
+      <ul id="inventory-list">
+        <li>🧪 ยาฟื้น HP x2</li>
+        <li>🥖 ขนมปัง x1</li>
+      </ul>
+    </aside>
+
+  </main>
+
+  <!-- เครดิต -->
+  <footer>
+    <p>© 2025 เกมสร้างโดยน้องเทพและพี่ชาย</p>
+  </footer>
+
+  <!-- เสียงประกอบ -->
+  <audio id="log-sound" src="assets\sounds\blip-131856.mp3" preload="auto"></audio>
+
+  <!-- ไฟล์เกม -->
+  <script src="game.js" defer></script>
 </body>
 </html>
