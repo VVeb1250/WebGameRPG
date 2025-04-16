@@ -4,5 +4,12 @@
     "maxHp": 100,
     "attack": 20,
     "emoji": "🧝‍♂️",
-    "inventory": []
-  }
+    "inventory": [],
+    "equipment": {
+        "weapon": {
+            "name": "ไม้เท้า",
+            "attack": 5,
+            "emoji": "🪄"
+        }
+    }
+}

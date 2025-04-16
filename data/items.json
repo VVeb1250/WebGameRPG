@@ -1,0 +1,29 @@
+[
+    {
+      "name": "Potion",
+      "type": "consumable",
+      "effect": "heal",
+      "value": 30,
+      "emoji": "🧪"
+    },
+    {
+      "name": "Mana Potion",
+      "type": "consumable",
+      "effect": "mana",
+      "value": 20,
+      "emoji": "🔷"
+    },
+    {
+      "name": "Power Elixir",
+      "type": "consumable",
+      "effect": "buff-attack",
+      "value": 5,
+      "emoji": "💥"
+    },
+    {
+        "name": "ดาบเหล็ก",
+        "type": "weapon",
+        "attack": 10,
+        "emoji": "🗡"
+    }
+  ]

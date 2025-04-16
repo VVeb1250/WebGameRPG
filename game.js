@@ -15,20 +15,23 @@ const questLog = document.getElementById("quest-log");
 let player = {};
 let enemies = [];
 let events = [];
+let itemData = []; // ไว้เก็บข้อมูลไอเทม
 
 async function loadData() {
-  const [eventRes, monsterRes, playerRes, sideRes] = await Promise.all([
+  const [eventRes, monsterRes, playerRes, sideRes, itemRes] = await Promise.all([
     fetch("data/events.json"),
     fetch("data/monsters.json"),
     fetch("data/player.json"),
-    fetch("data/sidequests.json")
+    fetch("data/sidequests.json"),
+    fetch("data/items.json")
   ]);
 
   events = await eventRes.json();
   enemies = await monsterRes.json();
   player = await playerRes.json();
   sideQuests = await sideRes.json();
-} 
+  itemData = await itemRes.json(); // โหลดข้อมูลไอเทมไว้ใช้
+}
 
 let currentEnemy = null;
 
@@ -58,7 +61,7 @@ function renderMenu() {
 }
 
 function attack() {
-  const dmg = Math.floor(Math.random() * player.attack);
+  const dmg = Math.floor(Math.random() * (player.attack + (player.equipment.weapon?.attack || 0)));
   currentEnemy.hp -= dmg;
   log(`คุณโจมตี ${currentEnemy.name} ได้ ${dmg} ดาเมจ`);
 
@@ -267,9 +270,15 @@ function log(text) {
   }
 
 
-function addItem(itemName) {
-    player.inventory.push(itemName);
-    log(`คุณได้รับ "${itemName}"`);
+function addItem(name) {
+    const item = itemData.find(i => i.name === name);
+    if (!item) {
+      console.warn("ไม่พบไอเทมชื่อ", name);
+      return;
+    }
+  
+    player.inventory.push({ ...item }); // clone
+    log(`คุณได้รับ "${item.name}"`);
     updateInventory();
 }
 function updateInventory() {
@@ -277,45 +286,66 @@ function updateInventory() {
     list.innerHTML = "";
   
     if (player.inventory.length === 0) {
-      list.innerHTML = "<li>- ว่างเปล่า -</li>";
+      list.innerHTML = "<li>- ไม่มีไอเทม -</li>";
       return;
     }
   
     player.inventory.forEach((item, index) => {
       const li = document.createElement("li");
-      li.innerHTML = `${item} <button onclick="useItem(${index})">ใช้</button>`;
+      let btn = "";
+  
+      if (item.type === "consumable") {
+        btn = `<button onclick="useItem(${index})">ใช้</button>`;
+      } else if (item.type === "weapon") {
+        btn = `<button onclick="equipItem(${index})">สวมใส่</button>`;
+      }
+  
+      li.innerHTML = `${item.emoji} ${item.name} ${btn}`;
       list.appendChild(li);
     });
-}
+  }
 function useItem(index) {
     const item = player.inventory[index];
   
-    switch (item) {
-      case "Potion":
-        if (player.hp >= player.maxHp) {
-          log("คุณมี HP เต็มอยู่แล้ว");
-          return;
-        }
-        player.hp = Math.min(player.hp + 30, player.maxHp);
-        log("🧪 คุณใช้ Potion และฟื้น HP +30");
+    if (item.type !== "consumable") {
+      log(`ไอเทมนี้ไม่สามารถใช้งานได้โดยตรง`);
+      return;
+    }
+  
+    switch (item.effect) {
+      case "heal":
+        player.hp = Math.min(player.hp + item.value, player.maxHp);
+        log(`${item.emoji} ฟื้น HP +${item.value}`);
         break;
   
-      case "Bomb":
-        if (currentEnemy) {
-          currentEnemy.hp -= 30;
-          log("💣 คุณขว้างระเบิดใส่ศัตรู -30 HP!");
-          renderScene();
-        } else {
-          log("ไม่มีศัตรูให้ขว้างระเบิด!");
-          return;
-        }
+      case "mana":
+        log(`${item.emoji} ฟื้น MP +${item.value} (ยังไม่ได้ทำระบบ MP)`);
+        break;
+  
+      case "buff-attack":
+        player.attack += item.value;
+        log(`${item.emoji} พลังโจมตีเพิ่มขึ้น +${item.value}`);
         break;
   
       default:
-        log(`คุณใช้ "${item}" แต่ไม่มีผลใด ๆ...`);
+        log(`${item.name} ไม่มีผลใด ๆ`);
     }
   
-    player.inventory.splice(index, 1); // ลบไอเทมออก
+    // ลบไอเทมออก
+    player.inventory.splice(index, 1);
+    updateInventory();
+}
+function equipItem(index) {
+    const item = player.inventory[index];
+  
+    if (item.type !== "weapon") {
+      log("ไอเทมนี้ไม่สามารถสวมใส่ได้");
+      return;
+    }
+  
+    player.equipment.weapon = item;
+    log(`🗡 คุณสวมใส่ ${item.name}`);
+    player.inventory.splice(index, 1);
     updateInventory();
 }
 
