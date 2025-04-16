@@ -12,29 +12,23 @@ let activeSideQuests = []; // เก็บหลายเควสต์
 
 const questLog = document.getElementById("quest-log");
 
-const player = {
-  name: "🧝‍♂️ ฮีโร่",
-  hp: 100,
-  maxHp: 100,
-  attack: 20,
-  emoji: "🧝‍♂️"
-};
-
-const enemies = [
-  { name: "Goblin", emoji: "👺", hp: 60, attack: 12 },
-  { name: "Slime", emoji: "🟢", hp: 40, attack: 8 },
-  { name: "Dragon", emoji: "🐉", hp: 100, attack: 20 }
-];
-
+let player = {};
+let enemies = [];
 let events = [];
-async function loadEvents() {
-    const res = await fetch("data/events.json");
-    events = await res.json();
-  
-    const sideRes = await fetch("data/sidequests.json");
-    sideQuests = await sideRes.json();
-  }
-  
+
+async function loadData() {
+  const [eventRes, monsterRes, playerRes, sideRes] = await Promise.all([
+    fetch("data/events.json"),
+    fetch("data/monsters.json"),
+    fetch("data/player.json"),
+    fetch("data/sidequests.json")
+  ]);
+
+  events = await eventRes.json();
+  enemies = await monsterRes.json();
+  player = await playerRes.json();
+  sideQuests = await sideRes.json();
+} 
 
 let currentEnemy = null;
 
@@ -144,12 +138,15 @@ function handleEffect(effect) {
 }
 
 function updateQuestLog() {
+    const questBox = document.getElementById("quest-log-content");
+    if (!questBox) return;
+  
     if (activeSideQuests.length === 0) {
-      questLog.innerHTML = "- ไม่มีเควสต์ -";
+      questBox.innerHTML = "- ไม่มีเควสต์ -";
       return;
     }
   
-    questLog.innerHTML = activeSideQuests.map(q => {
+    questBox.innerHTML = activeSideQuests.map(q => {
       const step = sideQuests[q.name][q.step];
       return `<strong>${q.name}</strong><br>${step.text}`;
     }).join("<hr>");
@@ -167,6 +164,12 @@ function removeQuest(name) {
     updateQuestLog();
   }
 
+async function loadSideQuests() {
+    const res = await fetch("data/sidequests.json");
+    const sideQuests = await res.json();
+    return sideQuests;
+  }
+// ฟังก์ชันสำหรับเล่นเควสต์
 function startSideQuest(name) {
     if (!sideQuests[name]) {
       console.warn(`ไม่พบเควสต์ชื่อ ${name}`);
@@ -263,7 +266,7 @@ function log(text) {
   
 
 window.onload = async () => {
-    await loadEvents();
+    await loadData();
     showIntro();
   };
   

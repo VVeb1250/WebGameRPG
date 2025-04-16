@@ -1,0 +1,38 @@
+[
+    {
+      "name": "Goblin",
+      "emoji": "👺",
+      "hp": 60,
+      "attack": 12,
+      "specialAbilities": ["เร็ว", "โจมตีเร็ว"]
+    },
+    {
+      "name": "Slime",
+      "emoji": "🟢",
+      "hp": 40,
+      "attack": 8,
+      "specialAbilities": ["การฟื้นฟู"]
+    },
+    {
+      "name": "Orc",
+      "emoji": "👹",
+      "hp": 80,
+      "attack": 15,
+      "specialAbilities": ["โจมตีหนัก"]
+    },
+    {
+      "name": "Undead Knight",
+      "emoji": "💀",
+      "hp": 90,
+      "attack": 18,
+      "specialAbilities": ["โจมตีด้วยดาบใหญ่"]
+    },
+    {
+      "name": "Wyvern",
+      "emoji": "🐲",
+      "hp": 120,
+      "attack": 22,
+      "specialAbilities": ["โจมตีระยะไกล", "พ่นไฟ"]
+    }
+  ]
+  
