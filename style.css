@@ -1,0 +1,92 @@
+body {
+    background-color: #1a0c2c; /* ม่วงเข้ม */
+    font-family: 'Segoe UI Emoji', sans-serif;
+    color: #f8f0e3;
+    text-align: center;
+  }
+  
+  #game-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  #scene {
+    background-color: #3e1f47;
+    border: 3px solid #a29bfe;
+    box-shadow: 0 0 10px #9c88ff;
+    border-radius: 8px;
+    font-size: 3rem;
+    padding: 30px;
+  }
+  
+  #status {
+    margin-top: 10px;
+    font-size: 1.1rem;
+  }
+  
+  #menu {
+    margin-top: 20px;
+  }
+  
+  .button {
+    background: linear-gradient(to bottom, #9b59b6, #8e44ad);
+    color: #fff8dc;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px #5e3370;
+    transition: all 0.1s ease-in-out;
+  }
+  
+  .button:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px #3d234a;
+  }
+  
+  p {
+    margin: 0.5rem 0;
+  }
+  
+  #log-box {
+    margin-top: 20px;
+    background-color: #2e144f;
+    border: 2px solid #dcdde1;
+    border-radius: 10px;
+    padding: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+    text-align: left;
+    box-shadow: 0 0 10px #8c7ae6;
+  }
+  
+  #log-box h3 {
+    margin: 0 0 5px;
+    font-size: 1rem;
+    color: #f5f6fa;
+    border-bottom: 1px solid #555;
+    padding-bottom: 5px;
+  }
+  
+  #log p {
+    margin: 4px 0;
+    font-size: 0.95rem;
+    color: #fff8dc;
+    animation: logFadeIn 0.3s ease-out;
+  }
+
+  @keyframes logFadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  
