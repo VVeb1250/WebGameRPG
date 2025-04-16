@@ -3,5 +3,6 @@
     "hp": 100,
     "maxHp": 100,
     "attack": 20,
-    "emoji": "🧝‍♂️"
+    "emoji": "🧝‍♂️",
+    "inventory": []
   }

@@ -126,6 +126,8 @@ function handleEffect(effect) {
     case "loot":  log("คุณได้ Potion! 🎁"); break;
     case "fight": log("ศัตรูโผล่มา! เตรียมสู้"); setTimeout(startBattle, 1000); return;
     case "reward": log("คุณได้รับ 50 Gold และค่าชื่อเสียง! 🏆"); break;
+    case "get-potion": addItem("Potion"); break;
+    case "get-bomb": addItem("Bomb"); break;
     case "none":
     default:
         log("คุณเดินทางต่อไป...");
@@ -263,7 +265,59 @@ function log(text) {
   
     logBox.scrollTop = 0;
   }
+
+
+function addItem(itemName) {
+    player.inventory.push(itemName);
+    log(`คุณได้รับ "${itemName}"`);
+    updateInventory();
+}
+function updateInventory() {
+    const list = document.getElementById("inventory-list");
+    list.innerHTML = "";
   
+    if (player.inventory.length === 0) {
+      list.innerHTML = "<li>- ว่างเปล่า -</li>";
+      return;
+    }
+  
+    player.inventory.forEach((item, index) => {
+      const li = document.createElement("li");
+      li.innerHTML = `${item} <button onclick="useItem(${index})">ใช้</button>`;
+      list.appendChild(li);
+    });
+}
+function useItem(index) {
+    const item = player.inventory[index];
+  
+    switch (item) {
+      case "Potion":
+        if (player.hp >= player.maxHp) {
+          log("คุณมี HP เต็มอยู่แล้ว");
+          return;
+        }
+        player.hp = Math.min(player.hp + 30, player.maxHp);
+        log("🧪 คุณใช้ Potion และฟื้น HP +30");
+        break;
+  
+      case "Bomb":
+        if (currentEnemy) {
+          currentEnemy.hp -= 30;
+          log("💣 คุณขว้างระเบิดใส่ศัตรู -30 HP!");
+          renderScene();
+        } else {
+          log("ไม่มีศัตรูให้ขว้างระเบิด!");
+          return;
+        }
+        break;
+  
+      default:
+        log(`คุณใช้ "${item}" แต่ไม่มีผลใด ๆ...`);
+    }
+  
+    player.inventory.splice(index, 1); // ลบไอเทมออก
+    updateInventory();
+}
 
 window.onload = async () => {
     await loadData();
