@@ -5,6 +5,10 @@ const statusBox = document.getElementById("status");
 const logBox = document.getElementById("log");
 const logSound = document.getElementById("log-sound");
 
+let activeSideQuest = null;
+let sideQuestStep = 0;
+let sideQuests = {};
+
 const player = {
   name: "🧝‍♂️ ฮีโร่",
   hp: 100,
@@ -22,9 +26,12 @@ const enemies = [
 let events = [];
 
 async function loadEvents() {
-  const res = await fetch("events.json");
-  events = await res.json();
-}
+    const res = await fetch("data/events.json");
+    events = await res.json();
+  
+    const sideRes = await fetch("data/sidequests.json");
+    sideQuests = await sideRes.json();
+  }
   
 
 let currentEnemy = null;
@@ -109,7 +116,76 @@ function nextEvent() {
       handleEffect(event.effect);
     }
   }
-   
+
+function handleEffect(effect) {
+    if (effect?.startsWith("sidequest-")) {
+    const questName = effect.replace("sidequest-", "");
+    startSideQuest(questName);
+    return;
+    }
+
+    switch (effect) {
+    case "boost": player.attack += 5; log("พลังโจมตีเพิ่มขึ้น! 💪 (+5)"); break;
+    case "trap":  player.hp -= 10; log("คุณโดนกับดัก! -10 HP"); break;
+    case "loot":  log("คุณได้ Potion! 🎁"); break;
+    case "fight": log("ศัตรูโผล่มา! เตรียมสู้"); setTimeout(startBattle, 1000); return;
+    case "reward": log("คุณได้รับ 50 Gold และค่าชื่อเสียง! 🏆"); break;
+    case "none":
+    default:
+        log("คุณเดินทางต่อไป...");
+        break;
+    }
+
+    if (effect !== "fight") {
+    menu.innerHTML = `<button class="button" onclick="nextEvent()">▶ เดินทางต่อ</button>`;
+    }
+}
+
+function startSideQuest(name) {
+    activeSideQuest = name;
+    sideQuestStep = 0;
+    nextSideQuestStep();
+  }
+  
+function nextSideQuestStep() {
+    const quest = sideQuests[activeSideQuest];
+    const step = quest[sideQuestStep];
+
+    scene.innerHTML = step.emoji;
+    statusBox.innerHTML = `<p>${step.text}</p>`;
+    menu.innerHTML = "";
+
+    if (step.choices) {
+    step.choices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.className = "button";
+        btn.textContent = choice.text;
+        btn.onclick = () => {
+        if (choice.effect === "next") {
+            sideQuestStep++;
+            nextSideQuestStep();
+        } else if (choice.effect === "exit") {
+            log("คุณออกจากเควสต์และกลับสู่การเดินทางปกติ");
+            activeSideQuest = null;
+            nextEvent();
+        } else {
+            handleEffect(choice.effect);
+        }
+        };
+        menu.appendChild(btn);
+    });
+    } else {
+    handleEffect(step.effect);
+    sideQuestStep++;
+    if (sideQuestStep < quest.length) {
+        menu.innerHTML = `<button class="button" onclick="nextSideQuestStep()">▶ ดำเนินต่อ</button>`;
+    } else {
+        log("เควสต์ย่อยสำเร็จ!");
+        activeSideQuest = null;
+        menu.innerHTML = `<button class="button" onclick="nextEvent()">▶ เดินทางต่อ</button>`;
+    }
+    }
+}
 
 function restart() {
     player.hp = player.maxHp;
