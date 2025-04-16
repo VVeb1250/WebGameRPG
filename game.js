@@ -9,6 +9,8 @@ let activeSideQuest = null;
 let sideQuestStep = 0;
 let sideQuests = {};
 
+const questLog = document.getElementById("quest-log");
+
 const player = {
   name: "🧝‍♂️ ฮีโร่",
   hp: 100,
@@ -24,7 +26,6 @@ const enemies = [
 ];
 
 let events = [];
-
 async function loadEvents() {
     const res = await fetch("data/events.json");
     events = await res.json();
@@ -141,9 +142,30 @@ function handleEffect(effect) {
     }
 }
 
+function updateQuestLog() {
+    if (!activeSideQuest) {
+      questLog.textContent = "- ไม่มีเควสต์ -";
+      return;
+    }
+  
+    const quest = sideQuests[activeSideQuest];
+    const step = quest[sideQuestStep];
+  
+    questLog.innerHTML = `
+      <strong>${activeSideQuest}</strong><br>
+      ${step.text}
+    `;
+  }
+function clearQuest() {
+    activeSideQuest = null;
+    sideQuestStep = 0;
+    updateQuestLog();
+  }
+
 function startSideQuest(name) {
     activeSideQuest = name;
     sideQuestStep = 0;
+    updateQuestLog();
     nextSideQuestStep();
   }
   
@@ -154,6 +176,8 @@ function nextSideQuestStep() {
     scene.innerHTML = step.emoji;
     statusBox.innerHTML = `<p>${step.text}</p>`;
     menu.innerHTML = "";
+
+    updateQuestLog();
 
     if (step.choices) {
     step.choices.forEach(choice => {

@@ -89,4 +89,28 @@ body {
     }
   }
   
+  #quest-box {
+    margin-top: 20px;
+    background-color: #352a4d;
+    border: 2px solid #9c88ff;
+    border-radius: 10px;
+    padding: 10px;
+    color: #f8f0e3;
+    text-align: left;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 0 8px #9c88ff88;
+  }
   
+  #quest-box h3 {
+    margin: 0 0 5px;
+    font-size: 1rem;
+    border-bottom: 1px solid #6c5ce7;
+    padding-bottom: 5px;
+    color: #ffeaa7;
+  }
+  
+  #quest-log {
+    font-size: 0.9rem;
+  }
